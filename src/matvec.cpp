@@ -77,7 +77,7 @@ std::vector<double> MatrixVectorMultiplicationExpected(const std::vector<std::ve
     return result;
 }
 
-bool RunMatrixVectorMultiplication(uint32_t ringDim, uint32_t dim, double maxMatrixVal, double maxVectorVal) {
+bool RunMatrixVectorMultiplication(std::string functionType, uint32_t ringDim, uint32_t dim, double maxMatrixVal, double maxVectorVal) {
     utils::PrintHeader("Running Matrix–Vector Multiplication\n", "⚙️");
     auto start = Clock::now();
 
@@ -103,7 +103,18 @@ bool RunMatrixVectorMultiplication(uint32_t ringDim, uint32_t dim, double maxMat
     std::vector<double> replicatedVector = ReplicateVector(vector);
     auto pt = cc->MakeCKKSPackedPlaintext(replicatedVector);
     auto encVec = cc->Encrypt(keys.publicKey, pt);
-    auto encResult = MatrixVectorMultiplication(cc, matrix, encVec);
+
+    Ciphertext<DCRTPoly> encResult;
+    if (functionType == "helib") {
+        encResult = MatrixVectorMultiplication(cc, matrix, encVec);
+    }
+    else if (functionType == "custom") {
+        std::cout<<"\nCustom function is not implemented yet.\n";
+    }
+    else {
+        std::cerr << "❌ Unknown function type: " << functionType << "\n";
+        return false;
+    }
 
     Plaintext result;
     cc->Decrypt(keys.secretKey, encResult, &result);

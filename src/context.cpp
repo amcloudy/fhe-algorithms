@@ -50,7 +50,7 @@ void PrintContextSummary(const CryptoContext<DCRTPoly>& cc, FHEScheme scheme) {
     auto encodingParams = cc->GetEncodingParams();
     auto elemParams = cc->GetCryptoParameters()->GetElementParams();
     std::cout << "📏  Ring Dimension:    " << std::setw(18) << elemParams->GetRingDimension() << "\n";
-    std::cout << "🔢  Batch Size:        " << std::setw(18) << encodingParams->GetBatchSize() << "\n";
+//    std::cout << "🔢  Batch Size:        " << std::setw(18) << encodingParams->GetBatchSize() << "\n";
 
     auto cryptoParamsCKKS = std::dynamic_pointer_cast<CryptoParametersCKKSRNS>(cc->GetCryptoParameters());
     if (cryptoParamsCKKS) {

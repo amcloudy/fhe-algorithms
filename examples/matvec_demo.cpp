@@ -5,6 +5,6 @@ void RunMatvecDemo() {
     ConfigLoader config("config.yaml");
     auto matvecParams = config.get_matvec_params();
 
-    RunMatrixVectorMultiplication(matvecParams.ringDims.front(), matvecParams.matrixSizes.front(), matvecParams.max_matrix_value, matvecParams.max_vector_value);
+    RunMatrixVectorMultiplication(matvecParams.functionVariants.front(), matvecParams.ringDims.front(), matvecParams.matrixSizes.front(), matvecParams.max_matrix_value, matvecParams.max_vector_value);
 
 }

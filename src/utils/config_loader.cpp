@@ -30,6 +30,7 @@ void ConfigLoader::load_config(const std::string& yamlPath) {
     matvec.max_vector_value = matvecNode["max_vector_value"].as<double>();
     matvec.rotationIndices = matvecNode["rotation_indices"].as<std::vector<int>>();
     matvec.outputCSV = matvecNode["outputCSV"].as<std::string>();
+    matvec.functionVariants = matvecNode["functionVariants"].as<std::vector<std::string>>();
 
     // ------------------ PolyEval Params ------------------
     const auto& polyNode = config["polyeval"];

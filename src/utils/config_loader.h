@@ -24,6 +24,7 @@ public:
         double max_vector_value;
         std::vector<int> rotationIndices;
         std::string outputCSV;
+        std::vector<std::string> functionVariants;
     };
 
     struct PolyEvalParams {

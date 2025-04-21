@@ -51,7 +51,7 @@ std::vector<double> MatrixVectorMultiplicationExpected(const std::vector<std::ve
  *
  * @return true if decrypted result is close to expected output.
  */
-bool RunMatrixVectorMultiplication(uint32_t ringDim, uint32_t matDim,
+bool RunMatrixVectorMultiplication(std::string functionType, uint32_t ringDim, uint32_t matDim,
                                        double maxMatrixVal = 0, double maxVectorVal = 0);
 
 #endif  // _MAT_VEC_H_

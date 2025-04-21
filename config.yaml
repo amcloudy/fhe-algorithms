@@ -11,6 +11,9 @@ matvec:
   max_vector_value: 3.0
   rotation_indices: [1]
   outputCSV: "bench/matvec/matvec_ring_bench.csv"
+  functionVariants:
+    - helib
+    - custom
 
 polyeval:
   ringDims: [ 32768, 65536, 131072 ]
