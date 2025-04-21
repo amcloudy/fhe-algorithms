@@ -1,0 +1,13 @@
+services:
+  fhe-algorithms-dev:
+    build:
+      context: ..
+      dockerfile: docker-files/Dockerfile
+    container_name: fhe-algorithms-dev
+    entrypoint: /bin/bash
+    stdin_open: true
+    tty: true
+    network_mode: host
+    volumes:
+      - ..:/fhe-algorithms
+    working_dir: /fhe-algorithms

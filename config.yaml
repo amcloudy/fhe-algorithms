@@ -1,0 +1,40 @@
+fhe:
+  scheme: ckks
+  scale_mod_size: 50
+  enable_bootstrapping: false
+
+matvec:
+  depth: 1
+  ringDims: [ 16384, 32768, 65536, 131072 ]
+  matrixSizes: [ 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
+  max_matrix_value: 5.0
+  max_vector_value: 3.0
+  rotation_indices: [1]
+  outputCSV: "bench/matvec/matvec_ring_bench.csv"
+
+polyeval:
+  ringDims: [ 32768, 65536, 131072 ]
+  depth: 5
+  vectorSizes: [ 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
+  max_vector_value: 3.0
+  outputCSV: "bench/polyeval/polyeval_ring_bench.csv"
+  functionVariants:
+    - openfhe
+    - custom
+  chebyshevCoeff:
+    - -0.0000000000
+    - 0.9548601071
+    - 0.0000000000
+    - -0.2283708821
+    - -0.0000000000
+    - 0.0422605239
+    - 0.0000000000
+    - -0.0048556560
+    - -0.0000000000
+    - 0.0003380545
+    - 0.0000000000
+    - -0.0000138422
+    - -0.0000000000
+    - 0.0000003060
+    - 0.0000000000
+    - -0.0000000028
