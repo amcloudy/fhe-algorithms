@@ -3,12 +3,7 @@
 
 using namespace lbcrypto;
 
-CryptoContext<DCRTPoly> CreateCryptoContext(FHEScheme scheme,
-                                            uint32_t depth,
-                                            uint32_t scaleModSize,
-                                            uint32_t batchSize,
-                                            uint32_t ringDim,
-                                            bool enableBootstrapping) {
+CryptoContext<DCRTPoly> CreateCryptoContext(FHEScheme scheme, uint32_t depth, uint32_t scaleModSize, uint32_t batchSize, uint32_t ringDim, bool enableBootstrapping) {
     if (scheme != FHEScheme::CKKS) {
         std::cerr << "Only CKKS is supported currently.\n";
         std::exit(EXIT_FAILURE);
@@ -36,7 +31,6 @@ CryptoContext<DCRTPoly> CreateCryptoContext(FHEScheme scheme,
 //    if (enableBootstrapping) {
 //        cc->Enable(BOOTSTRAPPING);
 //    }
-
     return cc;
 }
 
@@ -96,6 +90,5 @@ void PrintModulusChain(const CryptoContext<DCRTPoly>& cc) {
         std::cout << "  p" << (i - paramsQ.size()) << ": " << mod << "\n";
         P *= mod;
     }
-
     // std::cout << "Product of P moduli (P): " << P << "\n";
 }

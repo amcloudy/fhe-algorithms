@@ -4,7 +4,6 @@
 #include "context.h"
 #include "openfhe.h"
 
-
 #include <chrono>
 using Clock = std::chrono::high_resolution_clock;
 

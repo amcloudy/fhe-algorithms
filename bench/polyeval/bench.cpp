@@ -21,6 +21,5 @@ bool run_polyeval_benchmark_func(const ConfigLoader::PolyEvalParams& cfg, std::o
             }
         }
     }
-
     return true;
 }

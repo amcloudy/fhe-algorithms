@@ -3,3 +3,5 @@ build/
 .venv/
 bench/matvec/plot.log
 bench/polyeval/plot.log
+*.png
+*.csv

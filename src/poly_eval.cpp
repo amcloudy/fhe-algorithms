@@ -90,7 +90,6 @@ bool RunPolynomialEvaluation(std::string functionType, uint32_t ringDim, uint32_
         return false;
     }
 
-
     Plaintext result;
     cc->Decrypt(keys.secretKey, encResult, &result);
     result->SetLength(vecDim);
@@ -108,8 +107,7 @@ bool RunPolynomialEvaluation(std::string functionType, uint32_t ringDim, uint32_
     return isEqual;
 }
 
-std::vector<double> PolynomialEvaluationExpected(const std::vector<double>& vector,
-                                                 const std::vector<double>& coeffs) {
+std::vector<double> PolynomialEvaluationExpected(const std::vector<double>& vector, const std::vector<double>& coeffs) {
     std::vector<double> result(vector.size(), 0.0);
     for (size_t i = 0; i < vector.size(); ++i) {
         for (size_t j = 0; j < coeffs.size(); ++j)

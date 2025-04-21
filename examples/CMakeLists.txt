@@ -10,5 +10,4 @@ target_include_directories(fhe_examples PRIVATE
 )
 
 target_link_libraries(fhe_examples PRIVATE fhe_algorithms yaml-cpp::yaml-cpp)
-
 target_compile_definitions(fhe_examples PRIVATE CONFIG_PATH="${CMAKE_SOURCE_DIR}/config.yaml")

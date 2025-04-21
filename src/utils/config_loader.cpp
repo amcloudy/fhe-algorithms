@@ -41,5 +41,4 @@ void ConfigLoader::load_config(const std::string& yamlPath) {
     polyeval.outputCSV = polyNode["outputCSV"].as<std::string>();
     polyeval.chebyshevCoeff = polyNode["chebyshevCoeff"].as<std::vector<double>>();
     polyeval.functionVariants = polyNode["functionVariants"].as<std::vector<std::string>>();
-
 }

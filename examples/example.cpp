@@ -31,7 +31,6 @@ int main() {
             std::cerr << "❌ Invalid input. Please enter a number.\n";
             continue;
         }
-
         switch (choice) {
             case 1: RunMatvecDemo(); break;
             case 2: RunPolyEvalDemo(); break;
@@ -41,9 +40,7 @@ int main() {
             default:
                 std::cerr << "❌ Invalid choice. Try again.\n";
         }
-
         std::cout << "\n";
     }
-
     return 0;
 }
