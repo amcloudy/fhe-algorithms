@@ -2,12 +2,13 @@
 #include "../../src/utils/config_loader.h"
 #include <chrono>
 
-bool run_polyeval_benchmark_func(const ConfigLoader::PolyEvalParams& cfg, std::ostream& out) {
-    for (auto ringDim : cfg.ringDims) {
-        for (auto vecSize : cfg.vectorSizes) {
-            for (const auto& function : cfg.functionVariants) {
+bool run_polyeval_benchmark_func(std::ostream& out) {
+    ConfigLoader config("config.yaml");
+    for (auto ringDim : config.GetPolyEvalRingDims()) {
+        for (auto vecSize : config.GetPolyEvalVectorSizes()) {
+            for (const auto& function : config.GetPolyEvalFunctionVariants()) {
                 auto start = std::chrono::high_resolution_clock::now();
-                bool success = RunPolynomialEvaluation(function, ringDim, vecSize, cfg.max_vector_value);
+                bool success = RunPolynomialEvaluation(function, ringDim, vecSize, config.GetPolyEvalMaxVectorValue());
                 if (!success) {
                     std::cerr << "❌ Evaluation failed for ringDim=" << ringDim
                               << ", vectorSize=" << vecSize

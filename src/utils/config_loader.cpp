@@ -8,37 +8,44 @@ FHEScheme ParseScheme(const std::string& schemeStr) {
     throw std::invalid_argument("Unsupported scheme: " + schemeStr);
 }
 
-ConfigLoader::ConfigLoader(const std::string& yamlPath) {
-    load_config(yamlPath);
+ConfigLoader::ConfigLoader(const std::string& configFile) {
+    LoadConfiguration(configFile);
 }
 
-void ConfigLoader::load_config(const std::string& yamlPath) {
-    YAML::Node config = YAML::LoadFile(yamlPath);
+void ConfigLoader::LoadConfiguration(const std::string& configFile)
+{
+    YAML::Node config = YAML::LoadFile(configFile);
 
-    // ------------------ FHE Params ------------------
-    const auto& fheNode = config["fhe"];
-    fhe.scheme = fheNode["scheme"].as<std::string>();
-    fhe.scaleModSize = fheNode["scale_mod_size"].as<uint32_t>();
-    fhe.enableBootstrapping = fheNode["enable_bootstrapping"].as<bool>();
+    // Load FHE parameters
+    fheParams.scheme = config["fhe"]["scheme"].as<std::string>();
+    fheParams.scaleModSize = config["fhe"]["scale_mod_size"].as<uint32_t>();
+    fheParams.enableBootstrapping = config["fhe"]["enable_bootstrapping"].as<bool>();
 
-    // ------------------ MatVec Params ------------------
-    const auto& matvecNode = config["matvec"];
-    matvec.ringDims = matvecNode["ringDims"].as<std::vector<uint32_t>>();
-    matvec.depth = matvecNode["depth"].as<uint32_t>();
-    matvec.matrixSizes = matvecNode["matrixSizes"].as<std::vector<uint32_t>>();
-    matvec.max_matrix_value = matvecNode["max_matrix_value"].as<double>();
-    matvec.max_vector_value = matvecNode["max_vector_value"].as<double>();
-    matvec.rotationIndices = matvecNode["rotation_indices"].as<std::vector<int>>();
-    matvec.outputCSV = matvecNode["outputCSV"].as<std::string>();
-    matvec.functionVariants = matvecNode["functionVariants"].as<std::vector<std::string>>();
+    // Load matvec parameters
+    matVecParams.ringDims = config["matvec"]["ringDims"].as<std::vector<uint32_t>>();
+    matVecParams.depth = config["matvec"]["depth"].as<uint32_t>();
+    matVecParams.matrixSizes = config["matvec"]["matrixSizes"].as<std::vector<uint32_t>>();
+    matVecParams.max_matrix_value = config["matvec"]["max_matrix_value"].as<double>();
+    matVecParams.max_vector_value = config["matvec"]["max_vector_value"].as<double>();
+    matVecParams.rotationIndices = config["matvec"]["rotation_indices"].as<std::vector<int>>();
+    matVecParams.outputCSV = config["matvec"]["outputCSV"].as<std::string>();
+    matVecParams.functionVariants = config["matvec"]["functionVariants"].as<std::vector<std::string>>();
 
-    // ------------------ PolyEval Params ------------------
-    const auto& polyNode = config["polyeval"];
-    polyeval.ringDims = polyNode["ringDims"].as<std::vector<uint32_t>>();
-    polyeval.depth = polyNode["depth"].as<uint32_t>();
-    polyeval.vectorSizes = polyNode["vectorSizes"].as<std::vector<uint32_t>>();
-    polyeval.max_vector_value = polyNode["max_vector_value"].as<double>();
-    polyeval.outputCSV = polyNode["outputCSV"].as<std::string>();
-    polyeval.chebyshevCoeff = polyNode["chebyshevCoeff"].as<std::vector<double>>();
-    polyeval.functionVariants = polyNode["functionVariants"].as<std::vector<std::string>>();
+    // Load polyeval parameters
+    polyEvalParams.ringDims = config["polyeval"]["ringDims"].as<std::vector<uint32_t>>();
+    polyEvalParams.depth = config["polyeval"]["depth"].as<uint32_t>();
+    polyEvalParams.vectorSizes = config["polyeval"]["vectorSizes"].as<std::vector<uint32_t>>();
+    polyEvalParams.max_vector_value = config["polyeval"]["max_vector_value"].as<double>();
+    polyEvalParams.outputCSV = config["polyeval"]["outputCSV"].as<std::string>();
+    polyEvalParams.chebyshevCoeff = config["polyeval"]["chebyshevCoeff"].as<std::vector<double>>();
+    polyEvalParams.functionVariants = config["polyeval"]["functionVariants"].as<std::vector<std::string>>();
+
+    // Load File Paths
+    paths.keysPath = config["fhe"]["keyLocation"].as<std::string>();
+    paths.contextClientFileLocation = paths.keysPath + config["fhe"]["clientContextFile"].as<std::string>();
+    paths.contextServerFileLocation = paths.keysPath + config["fhe"]["serverContextFile"].as<std::string>();
+    paths.secretKeyFileLocation = paths.keysPath + config["fhe"]["secretKeyFile"].as<std::string>();
+    paths.publicKeyFileLocation = paths.keysPath + config["fhe"]["publicKeyFile"].as<std::string>();
+    paths.rotKeysFileLocation = paths.keysPath + config["fhe"]["rotKeysFile"].as<std::string>();
+    paths.mulKeysFileLocation = paths.keysPath + config["fhe"]["mulKeysFile"].as<std::string>();
 }

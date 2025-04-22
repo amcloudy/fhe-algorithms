@@ -43,7 +43,7 @@ std::vector<Ciphertext<DCRTPoly>> compute_odd_powers(const CryptoContext<DCRTPol
 
 Ciphertext<DCRTPoly> chebyshev_polynomial_evaluation(const CryptoContext<DCRTPoly>& cc, const Ciphertext<DCRTPoly>& enc_input) {
     ConfigLoader config("config.yaml");
-    std::vector<double> coeffs = config.get_polyeval_params().chebyshevCoeff;
+    std::vector<double> coeffs = config.GetChebyshevCoefficients();
     size_t coeff_size = coeffs.size();
     std::vector<Ciphertext<DCRTPoly>> powers = compute_odd_powers(cc, enc_input, coeff_size - 1);
     Ciphertext<DCRTPoly> enc_result = cc->EvalMult(powers[0], coeffs[1]);
@@ -60,11 +60,25 @@ bool RunPolynomialEvaluation(std::string functionType, uint32_t ringDim, uint32_
     auto start = std::chrono::high_resolution_clock::now();
     ConfigLoader config("config.yaml");
 
-    auto fheParams = config.get_fhe_params();
-    auto polyParams = config.get_polyeval_params();
-    auto scheme = ParseScheme(fheParams.scheme);
+    auto scheme = ParseScheme(config.GetFHEScheme());
 
-    auto cc = CreateCryptoContext(scheme, polyParams.depth, fheParams.scaleModSize, vecDim, ringDim);
+    if (scheme != FHEScheme::CKKS) {
+        std::cerr << "Only CKKS is supported currently.\n";
+        std::exit(EXIT_FAILURE);
+    }
+
+    CCParams<CryptoContextCKKSRNS> params;
+    params.SetMultiplicativeDepth(config.GetPolyEvalDepth());
+    params.SetScalingModSize(config.GetScaleModSize());
+    params.SetSecurityLevel(SecurityLevel::HEStd_128_classic);
+    params.SetRingDim(ringDim);
+
+    auto cc = GenCryptoContext(params);
+
+    cc->Enable(PKE);
+    cc->Enable(KEYSWITCH);
+    cc->Enable(LEVELEDSHE);
+    cc->Enable(ADVANCEDSHE);
 
     auto keys = cc->KeyGen();
     cc->EvalMultKeyGen(keys.secretKey);
@@ -72,7 +86,7 @@ bool RunPolynomialEvaluation(std::string functionType, uint32_t ringDim, uint32_
 
     std::vector<double> vector;
     utils::GenerateRandomVector(vector, vecDim, maxVectorVal);
-    PrintContextSummary(cc, scheme);
+    utils::PrintContextSummary(cc, scheme);
 
     auto pt = cc->MakeCKKSPackedPlaintext(vector);
     auto encVec = cc->Encrypt(keys.publicKey, pt);
@@ -80,7 +94,7 @@ bool RunPolynomialEvaluation(std::string functionType, uint32_t ringDim, uint32_
     Ciphertext<DCRTPoly> encResult;
 
     if (functionType == "openfhe") {
-        encResult = cc->EvalPoly(encVec, config.get_polyeval_params().chebyshevCoeff);
+        encResult = cc->EvalPoly(encVec, config.GetChebyshevCoefficients());
     }
     else if (functionType == "custom") {
         encResult = chebyshev_polynomial_evaluation(cc, encVec);
@@ -96,7 +110,7 @@ bool RunPolynomialEvaluation(std::string functionType, uint32_t ringDim, uint32_
 
     std::cout << "🔢  Vector dimension:  " << std::setw(18) << vecDim << "\n";
 
-    std::vector<double> expected = PolynomialEvaluationExpected(vector, config.get_polyeval_params().chebyshevCoeff);
+    std::vector<double> expected = PolynomialEvaluationExpected(vector, config.GetChebyshevCoefficients());
     bool isEqual = compare_vectors(result->GetRealPackedValue(), expected);
     auto end = std::chrono::high_resolution_clock::now();
     double ms = std::chrono::duration<double, std::milli>(end - start).count();

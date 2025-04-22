@@ -2,7 +2,6 @@
 #define POLY_EVAL_H
 
 #include "openfhe.h"
-#include "context.h"
 #include "utils/helper_utils.h"
 #include "utils/config_loader.h"
 

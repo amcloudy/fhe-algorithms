@@ -2,10 +2,17 @@ fhe:
   scheme: ckks
   scale_mod_size: 50
   enable_bootstrapping: false
+  clientContextFile: "client_context_file.bin"
+  serverContextFile: "server_context_file.bin"
+  secretKeyFile: "secret_key_file.bin"
+  publicKeyFile: "public_key_file.bin"
+  rotKeysFile: "rot_keys.bin"
+  mulKeysFile: "mul_keys.bin"
+  keyLocation: "keys/"
 
 matvec:
   depth: 1
-  ringDims: [ 16384, 32768, 65536, 131072 ]
+  ringDims: [ 16384, 32768, 65536 ]
   matrixSizes: [ 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
   max_matrix_value: 5.0
   max_vector_value: 3.0
@@ -13,7 +20,7 @@ matvec:
   outputCSV: "bench/matvec/matvec_ring_bench.csv"
   functionVariants:
     - helib
-    - custom
+#    - parallel
 
 polyeval:
   ringDims: [ 32768, 65536, 131072 ]

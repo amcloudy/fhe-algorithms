@@ -1,7 +1,6 @@
 add_subdirectory(utils)
 
 add_library(fhe_algorithms
-        context.cpp
         matvec.cpp
         poly_eval.cpp
 )

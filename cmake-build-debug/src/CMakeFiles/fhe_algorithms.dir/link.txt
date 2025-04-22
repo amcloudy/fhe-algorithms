@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libfhe_algorithms.a CMakeFiles/fhe_algorithms.dir/matvec.cpp.o CMakeFiles/fhe_algorithms.dir/poly_eval.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libfhe_algorithms.a

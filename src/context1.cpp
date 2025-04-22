@@ -1,4 +1,3 @@
-#include "context.h"
 #include <iostream>
 
 using namespace lbcrypto;

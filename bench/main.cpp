@@ -3,11 +3,11 @@
 #include <fstream>
 #include <functional>
 
-bool run_matvec_benchmark(const ConfigLoader::MatVecParams&, std::ostream&);
-bool run_polyeval_benchmark_func(const ConfigLoader::PolyEvalParams&, std::ostream&);
+bool run_matvec_benchmark(std::ostream&);
+bool run_polyeval_benchmark_func(std::ostream&);
 
 int main() {
-    ConfigLoader config(CONFIG_PATH);
+    ConfigLoader config("config.yaml");
 
     while (true) {
         std::cout << "\n============================\n";
@@ -27,29 +27,30 @@ int main() {
 
         switch (choice) {
             case 1: {
-                const auto& cfg = config.get_matvec_params();
-                std::ofstream out(cfg.outputCSV);
+                std::ofstream out(config.GetMatVecOutputCSV(), std::ios::trunc);
+                if (!out.is_open()) {
+                    std::cerr << "❌ Failed to open output file: " << config.GetMatVecOutputCSV() << "\n";
+                    break;
+                }
                 out << "ring_dim,matrix_size,time_ms\n";
-                if (run_matvec_benchmark(cfg, out))
-                    std::cout << "✅ Matvec benchmark done: " << cfg.outputCSV << "\n";
+                if (run_matvec_benchmark(out))
+                    std::cout << "✅ Matvec benchmark done: " << config.GetMatVecOutputCSV() << "\n";
                 else
                     std::cerr << "❌ Matvec benchmark failed.\n";
                 break;
             }
 
             case 2: {
-                const auto& cfg = config.get_polyeval_params();
-
-                std::ofstream out(cfg.outputCSV, std::ios::trunc);  // ✅ clear file
+                std::ofstream out(config.GetPolyEvalOutputCSV(), std::ios::trunc);  // ✅ clear file
                 if (!out.is_open()) {
-                    std::cerr << "❌ Failed to open output file: " << cfg.outputCSV << "\n";
+                    std::cerr << "❌ Failed to open output file: " << config.GetPolyEvalOutputCSV() << "\n";
                     break;
                 }
 
                 out << "ring_dim, vecSize, function, time_ms\n";
 
-                if (run_polyeval_benchmark_func(cfg, out))
-                    std::cout << "✅ PolyEval benchmark done: " << cfg.outputCSV << "\n";
+                if (run_polyeval_benchmark_func(out))
+                    std::cout << "✅ PolyEval benchmark done: " << config.GetPolyEvalOutputCSV() << "\n";
                 else
                     std::cerr << "❌ PolyEval benchmark failed.\n";
 

@@ -9,8 +9,7 @@
 #include "utils/config_loader.h"
 #include "utils/scheme_defs.h"
 
-lbcrypto::CryptoContext<lbcrypto::DCRTPoly>
-CreateCryptoContext(FHEScheme scheme, uint32_t depth, uint32_t scaleModSize, uint32_t batchSize, uint32_t ringDim, bool enableBootstrapping = false);
+lbcrypto::CryptoContext<lbcrypto::DCRTPoly> CreateCryptoContext(FHEScheme scheme, uint32_t depth, uint32_t scaleModSize, uint32_t batchSize, uint32_t ringDim, bool enableBootstrapping = false);
 void PrintContextSummary(const lbcrypto::CryptoContext<lbcrypto::DCRTPoly>& cc, FHEScheme scheme);
 void PrintModulusChain(const lbcrypto::CryptoContext<lbcrypto::DCRTPoly>& cc);
 

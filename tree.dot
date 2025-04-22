@@ -1,0 +1,64 @@
+digraph FHE_Algorithms {
+    // Left-to-right layout
+    rankdir=LR;
+
+    node [shape=box, style=filled, fillcolor="#e6e6ff", fontname="Courier New", fontsize=10];
+
+    root [label="fhe-algorithms"];
+
+    // Top-level files
+    root -> "CMakeLists.txt";
+    root -> "config.yaml";
+    root -> "README.md";
+    root -> "run.sh";
+
+    // bench/
+    root -> bench [label="bench"];
+    bench -> "bench/CMakeLists.txt";
+    bench -> "bench/main.cpp";
+    bench -> matvec [label="matvec"];
+    bench -> polyeval [label="polyeval"];
+
+    matvec -> "bench/matvec/bench.cpp";
+    matvec -> "bench/matvec/matvec_plot.png";
+    matvec -> "bench/matvec/matvec_ring_bench.csv";
+    matvec -> "bench/matvec/plot.py";
+    matvec -> "bench/matvec/plot.sh";
+
+    polyeval -> "bench/polyeval/bench.cpp";
+    polyeval -> "bench/polyeval/plot.log";
+    polyeval -> "bench/polyeval/plot.py";
+    polyeval -> "bench/polyeval/plot.sh";
+    polyeval -> "bench/polyeval/polyeval_plot.png";
+    polyeval -> "bench/polyeval/polyeval_ring_bench.csv";
+
+    // docker-files/
+    root -> docker [label="docker-files"];
+    docker -> "docker-files/docker-compose.yaml";
+    docker -> "docker-files/Dockerfile";
+
+    // examples/
+    root -> examples [label="examples"];
+    examples -> "examples/CMakeLists.txt";
+    examples -> "examples/example.cpp";
+    examples -> "examples/matvec_demo.cpp";
+    examples -> "examples/polyeval_demo.cpp";
+
+    // src/
+    root -> src [label="src"];
+    src -> "src/CMakeLists.txt";
+    src -> "src/context.cpp";
+    src -> "src/context.h";
+    src -> "src/matvec.cpp";
+    src -> "src/matvec.h";
+    src -> "src/poly_eval.cpp";
+    src -> "src/poly_eval.h";
+    src -> utils [label="utils"];
+
+    utils -> "src/utils/CMakeLists.txt";
+    utils -> "src/utils/config_loader.cpp";
+    utils -> "src/utils/config_loader.h";
+    utils -> "src/utils/helper_utils.cpp";
+    utils -> "src/utils/helper_utils.h";
+    utils -> "src/utils/scheme_defs.h";
+}
