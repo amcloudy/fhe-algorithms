@@ -5,3 +5,4 @@ bench/matvec/plot.log
 bench/polyeval/plot.log
 *.png
 *.csv
+cmake-build-debug/

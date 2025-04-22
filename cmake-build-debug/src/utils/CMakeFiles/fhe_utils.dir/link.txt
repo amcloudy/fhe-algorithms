@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc libfhe_utils.a CMakeFiles/fhe_utils.dir/config_loader.cpp.o CMakeFiles/fhe_utils.dir/helper_utils.cpp.o CMakeFiles/fhe_utils.dir/serialization_utils.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib libfhe_utils.a
