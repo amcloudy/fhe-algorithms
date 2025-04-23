@@ -1,7 +1,6 @@
 #include "matvec.h"
 #include "utils/helper_utils.h"
 #include "utils/config_loader.h"
-#include "utils/serialization_utils.h"
 
 #include "openfhe.h"
 #include <omp.h>
@@ -43,20 +42,6 @@ Ciphertext<DCRTPoly> MatrixVectorMultiplication(const CryptoContext<DCRTPoly> &c
     return cc->EvalAddMany(tempCiphertext);
 }
 
-//Ciphertext<DCRTPoly> MatrixVectorMultiplicationParallel(const CryptoContext<DCRTPoly> &cc, const std::vector<std::vector<double>> &inputMatrix, const Ciphertext<DCRTPoly> &encInput) {
-//    size_t dimension = inputMatrix.size();
-//    std::vector<std::vector<double>> diagonalMatrix = ExtractDiagonals(inputMatrix);
-//    std::vector<Plaintext> plainDiagonalMatrix(dimension);
-//    std::vector<Ciphertext<DCRTPoly>> tempCiphertext(dimension);
-//
-//    for (size_t i = 0; i < dimension; ++i) {
-//        plainDiagonalMatrix[i] = cc->MakeCKKSPackedPlaintext(diagonalMatrix[i]);
-//        tempCiphertext[i] = (i > 0) ? cc->EvalRotate(encInput, i) : encInput;
-//        tempCiphertext[i] = cc->EvalMult(tempCiphertext[i], plainDiagonalMatrix[i]);
-//    }
-//    return cc->EvalAddMany(tempCiphertext);
-//}
-
 Ciphertext<DCRTPoly> MatrixVectorMultiplicationParallel(const CryptoContext<DCRTPoly> &cc, const std::vector<std::vector<double>> &inputMatrix, const Ciphertext<DCRTPoly> &encInput) {
     size_t dimension = inputMatrix.size();
     std::vector<std::vector<double>> diagonalMatrix = ExtractDiagonals(inputMatrix);
@@ -65,14 +50,15 @@ Ciphertext<DCRTPoly> MatrixVectorMultiplicationParallel(const CryptoContext<DCRT
     std::vector<Ciphertext<DCRTPoly>> tempCiphertext(dimension);
 
     // Parallel region for rotation + multiplication
-    #pragma omp parallel for
-    for (int i = 0; i < static_cast<int>(dimension); ++i) {
+    int i;
+    #pragma omp parallel for default(none) \
+    shared(dimension, cc, diagonalMatrix, encInput, plainDiagonalMatrix, tempCiphertext) \
+    private(i)
+    for ( i = 0; i < static_cast<int>(dimension); ++i) {
         plainDiagonalMatrix[i] = cc->MakeCKKSPackedPlaintext(diagonalMatrix[i]);
         Ciphertext<DCRTPoly> rotatedEncInput = (i > 0) ? cc->EvalRotate(encInput, i) : encInput;
         tempCiphertext[i] = cc->EvalMult(rotatedEncInput, plainDiagonalMatrix[i]);
     }
-
-    // Final reduction (must remain sequential)
     return cc->EvalAddMany(tempCiphertext);
 }
 
@@ -129,19 +115,11 @@ bool RunMatrixVectorMultiplication(std::string functionType, uint32_t ringDim, u
     params.SetRingDim(ringDim);
     params.SetScalingTechnique(FLEXIBLEAUTOEXT);
 
-    // Uncomment this if bootstrapping is supported/enabled later
-    // if (fheParams.enableBootstrapping) {
-    //     params.SetEnableBootstrapping(true);
-    // }
-
     CryptoContext<DCRTPoly> cc = GenCryptoContext(params);
     cc->Enable(PKE);
     cc->Enable(KEYSWITCH);
     cc->Enable(LEVELEDSHE);
     cc->Enable(ADVANCEDSHE);
-    // if (fheParams.enableBootstrapping) {
-    //     cc->Enable(BOOTSTRAPPING);
-    // }
 
     // Key generation
     auto keys = cc->KeyGen();
@@ -159,34 +137,11 @@ bool RunMatrixVectorMultiplication(std::string functionType, uint32_t ringDim, u
     }
     cc->EvalRotateKeyGen(keys.secretKey, rotationIndices);
 
-    // SerializeToFile(config.GetKeysPath(), config.GetClientContextFileLocation(), cc);
-    // SerializeToFile(config.GetKeysPath(), config.GetServerContextFileLocation(), cc);
-    // SerializeToFile(config.GetKeysPath(), config.GetMulKeysFileLocation(), cc, "EvalMult");
-    // SerializeToFile(config.GetKeysPath(), config.GetRotKeysFileLocation(), cc, "EvalAutomorphism");
-    // SerializeToFile(config.GetKeysPath(), config.GetSecretKeyFileLocation(), keys.secretKey);
-    // SerializeToFile(config.GetKeysPath(), config.GetPublicKeyFileLocation(), keys.publicKey);
-
-
-//    cc->ClearEvalMultKeys();
-//    cc->ClearEvalAutomorphismKeys();
-//    lbcrypto::CryptoContextFactory<lbcrypto::DCRTPoly>::ReleaseAllContexts();
-
-
-    // Generate random matrix and vector
     std::vector<std::vector<double>> matrix;
     std::vector<double> vector;
     utils::GenerateRandomMatrix(matrix, dim, maxMatrixVal);
     utils::GenerateRandomVector(vector, dim, maxVectorVal);
 
-    // Encrypt vector
-
-    // Deserialize the crypto context and required keys from the client
-//    lbcrypto::CryptoContext<lbcrypto::DCRTPoly> ccServer;
-//    DeserializeFromFile(configLoader.GetContextFile(), ccServer);
-//    DeserializeFromFile(configLoader.GetMulKeysFile(), ccServer, "EvalMult");
-//    DeserializeFromFile(configLoader.GetRotKeysFile(), ccServer, "EvalAutomorphism");
-//
-//
     utils::PrintContextSummary(cc, scheme);
     std::vector<double> replicatedVector = ReplicateVector(vector);
     auto pt = cc->MakeCKKSPackedPlaintext(replicatedVector);

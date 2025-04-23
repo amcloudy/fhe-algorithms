@@ -1,5 +1,7 @@
 services:
   fhe-algorithms-dev:
+    ports:
+      - "8080:8080"
     build:
       context: ..
       dockerfile: docker-files/Dockerfile

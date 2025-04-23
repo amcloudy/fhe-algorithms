@@ -12,15 +12,15 @@ fhe:
 
 matvec:
   depth: 1
-  ringDims: [ 16384, 32768, 65536 ]
-  matrixSizes: [ 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
+  ringDims: [ 32768, 65536 ]
+  matrixSizes: [ 2, 4, 8, 16, 32, 64, 128, 256, 512]
   max_matrix_value: 5.0
   max_vector_value: 3.0
   rotation_indices: [1]
   outputCSV: "bench/matvec/matvec_ring_bench.csv"
   functionVariants:
     - helib
-#    - parallel
+    - parallel
 
 polyeval:
   ringDims: [ 32768, 65536, 131072 ]

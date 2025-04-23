@@ -32,6 +32,9 @@ if [ -t 1 ]; then
   DOCKER_INTERACTIVE="-it"
 fi
 
+
+
+
 # --- Shared Build Command ---
 BUILD_COMMAND="
   cd /fhe-algorithms &&
@@ -68,5 +71,30 @@ if $RUN_BENCH; then
     ./build/bench/bench_main"
 fi
 
- --- Shut down ---
-docker compose -f docker-files/docker-compose.yaml down
+//plot.sh
+
+cd "$(dirname "$0")" || exit 1
+
+CSV_FILE="polyeval_ring_bench.csv"
+
+# Check CSV existence
+if [ ! -f "$CSV_FILE" ]; then
+  echo "❌ CSV file '$CSV_FILE' not found. Please run the benchmark first."
+  exit 1
+fi
+
+# Create virtualenv if not exists
+if [ ! -d ".venv" ]; then
+  echo "🔧 Creating virtualenv..."
+  python3 -m venv .venv
+fi
+
+# Activate virtualenv
+source .venv/bin/activate
+
+# Install required packages silently
+pip3 install -q pandas matplotlib
+
+
+# --- Shut down ---
+#docker compose -f docker-files/docker-compose.yaml down

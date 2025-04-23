@@ -32,7 +32,7 @@ int main() {
                     std::cerr << "❌ Failed to open output file: " << config.GetMatVecOutputCSV() << "\n";
                     break;
                 }
-                out << "ring_dim,matrix_size,time_ms\n";
+                out << "ring_dim, matrix_size, function, time_ms\n";
                 if (run_matvec_benchmark(out))
                     std::cout << "✅ Matvec benchmark done: " << config.GetMatVecOutputCSV() << "\n";
                 else

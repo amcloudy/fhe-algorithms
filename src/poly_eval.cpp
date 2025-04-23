@@ -55,7 +55,7 @@ Ciphertext<DCRTPoly> chebyshev_polynomial_evaluation(const CryptoContext<DCRTPol
     return enc_result;
 }
 
-bool RunPolynomialEvaluation(std::string functionType, uint32_t ringDim, uint32_t vecDim, double maxVectorVal) {
+bool RunPolynomialEvaluation(const std::string &functionType, uint32_t ringDim, uint32_t vecDim, double maxVectorVal) {
     utils::PrintHeader("Running Polynomial Evaluation\n", "⚙️");
     auto start = std::chrono::high_resolution_clock::now();
     ConfigLoader config("config.yaml");

@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+import numpy as np
 import os
 import warnings
 import re
@@ -28,15 +29,13 @@ df["ring_dim"] = df["ring_dim"].astype(str)
 df["vector_size"] = df["vector_size"].astype(int)
 
 # ---------- Color & Line Style Setup ----------
-# Better palette: colorblind-friendly (Color Universal Design palette)
 function_colors = {
-    "openfhe": "#E69F00",   # orange
-    "custom": "#56B4E9",    # sky blue
-    "lagrange": "#009E73",  # teal
-    "odd_powers": "#D55E00" # red-orange
+    "openfhe": "#E69F00",
+    "custom": "#56B4E9",
+    "lagrange": "#009E73",
+    "odd_powers": "#D55E00"
 }
 
-# Stylized line types
 linestyles = ["solid", "dashed", "dashdot", (0, (1, 1)), (0, (3, 5, 1, 5))]
 markers = ["o", "s", "^", "D", "P"]
 ring_dims = sorted(df["ring_dim"].unique())
@@ -44,8 +43,6 @@ ring_styles = {dim: (linestyles[i % len(linestyles)], markers[i % len(markers)])
 
 # ---------- Plot ----------
 plt.figure(figsize=(12, 7))
-
-# Store handles and labels for custom-sorted legend
 plotted_handles = []
 plotted_labels = []
 
@@ -73,31 +70,39 @@ plt.title("Polynomial Evaluation Time by Vector Size, Ring Dimension, and Functi
 plt.xscale("log", base=2)
 plt.yscale("log")
 
-# Smart log2 tick formatter
 def is_power_of_two(n):
     return n > 0 and (n & (n - 1)) == 0
 
 def log_label(x, pos):
     try:
         val = int(x)
-        if is_power_of_two(val):
-            return f"$2^{{{val.bit_length() - 1}}}$"
-        else:
-            return f"{val}"
+        return f"$2^{{{val.bit_length() - 1}}}$" if is_power_of_two(val) else f"{val}"
     except Exception:
         return str(x)
 
 plt.gca().xaxis.set_major_formatter(ticker.FuncFormatter(log_label))
 
-# ---------- Sort legend manually ----------
+# ---------- Y-Ticks: 10^1 to 10^5 ----------
+y_decades = [10**i for i in range(1, 6)]
+plt.yticks(y_decades, [f"$10^{int(np.log10(y))}$" for y in y_decades])
+plt.gca().yaxis.set_major_locator(ticker.FixedLocator(y_decades))
+
+# ---------- Grid ----------
+plt.grid(axis="y", which="major", linestyle="--", linewidth=0.5, alpha=0.7)
+plt.minorticks_off()
+
+# Vertical gridlines at powers of 2: 2^1 to 2^10
+for x in [2**i for i in range(1, 11)]:
+    plt.axvline(x=x, color="gray", linestyle=":", linewidth=0.5, alpha=0.5)
+
+# ---------- Legend ----------
 def parse_label(label):
-    match = re.search(r'(custom|openfhe)\s*@\s*N=(\d+)', label)
+    match = re.search(r'(\w+)\s*@\s*N=(\d+)', label)
     if match:
         func = match.group(1)
         n = int(match.group(2))
-        func_order = 0 if func == "custom" else 1
-        return (n, func_order)
-    return (float('inf'), 2)
+        return (n, func)
+    return (float('inf'), 'zzz')
 
 sorted_pairs = sorted(zip(plotted_labels, plotted_handles), key=lambda x: parse_label(x[0]))
 sorted_labels, sorted_handles = zip(*sorted_pairs)
@@ -105,9 +110,7 @@ sorted_labels, sorted_handles = zip(*sorted_pairs)
 plt.legend(sorted_handles, sorted_labels, title="Function @ RingDim", fontsize=9, title_fontsize=10, loc="lower right")
 
 # ---------- Save ----------
-plt.grid(True, which="both", linestyle="--", linewidth=0.4, alpha=0.7)
 plt.tight_layout()
 plt.savefig(output_path, dpi=600, bbox_inches="tight")
 plt.show()
-print(f"✅ Plot saved to: {output_path}")
-
+print(f"✅ PolyEval Plot saved to: {output_path}")
