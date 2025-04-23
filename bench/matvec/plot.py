@@ -71,11 +71,24 @@ ax.set_title("Matrix-Vector Multiplication Time by Matrix Size, Ring Dimension, 
 x_ticks = [2**i for i in range(1, 10)]
 y_ticks = [10**i for i in range(1, 6)]
 
-ax.set_xticks(x_ticks)
-ax.set_xticklabels([f"$2^{{{int(np.log2(x))}}}$" for x in x_ticks])
+# ax.set_xticks(x_ticks)
+# ax.set_xticklabels([f"$2^{{{int(np.log2(x))}}}$" for x in x_ticks])
+#
+# ax.set_yticks(y_ticks)
+# ax.set_yticklabels([f"$10^{int(np.log10(y))}$" for y in y_ticks])
 
+from matplotlib.ticker import FuncFormatter
+
+x_ticks = [2**i for i in range(1, 10)]
+y_ticks = [10**i for i in range(1, 6)]
+
+ax.set_xticks(x_ticks)
 ax.set_yticks(y_ticks)
-ax.set_yticklabels([f"$10^{int(np.log10(y))}$" for y in y_ticks])
+
+# ✅ Pretty formatter + preserve data ticks for tooltips
+ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: f"$2^{{{int(np.log2(x))}}}$" if x in x_ticks else ""))
+ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: f"$10^{{{int(np.log10(y))}}}$" if y in y_ticks else ""))
+
 
 # ---------- Grid ----------
 ax.grid(False)
@@ -92,6 +105,13 @@ def parse_label(label):
 sorted_items = sorted(zip(labels, handles), key=lambda x: parse_label(x[0]))
 sorted_labels, sorted_handles = zip(*sorted_items)
 ax.legend(sorted_handles, sorted_labels, title="Function @ RingDim", fontsize=9, title_fontsize=10, loc="lower right")
+
+# Fix to display (x, y) manually with pretty ticks
+def format_coord(x, y):
+    return f"(x, y) = ({x:.2f}, {y:.2f})"
+
+ax.format_coord = format_coord
+
 
 # ---------- Save and Show ----------
 plt.tight_layout()
