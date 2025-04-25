@@ -1,4 +1,4 @@
-FROM --platform=linux/arm64 ubuntu:20.04
+FROM  ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CC=/usr/bin/gcc-10

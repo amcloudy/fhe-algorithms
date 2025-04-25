@@ -23,17 +23,24 @@ for arg in "$@"; do
   esac
 done
 
+# Detect correct docker compose command
+if command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+elif docker compose version >/dev/null 2>&1; then
+    DOCKER_COMPOSE="docker compose"
+else
+    echo "❌ Docker Compose not found"
+    exit 1
+fi
+
 # --- Start container ---
-docker compose -f docker-files/docker-compose.yaml up --build -d
+$DOCKER_COMPOSE -f docker-files/docker-compose.yaml up --build -d
 
 # --- Interactive Terminal Check ---
 DOCKER_INTERACTIVE=""
 if [ -t 1 ]; then
   DOCKER_INTERACTIVE="-it"
 fi
-
-
-
 
 # --- Shared Build Command ---
 BUILD_COMMAND="
@@ -71,30 +78,5 @@ if $RUN_BENCH; then
     ./build/bench/bench_main"
 fi
 
-//plot.sh
-
-cd "$(dirname "$0")" || exit 1
-
-CSV_FILE="polyeval_ring_bench.csv"
-
-# Check CSV existence
-if [ ! -f "$CSV_FILE" ]; then
-  echo "❌ CSV file '$CSV_FILE' not found. Please run the benchmark first."
-  exit 1
-fi
-
-# Create virtualenv if not exists
-if [ ! -d ".venv" ]; then
-  echo "🔧 Creating virtualenv..."
-  python3 -m venv .venv
-fi
-
-# Activate virtualenv
-source .venv/bin/activate
-
-# Install required packages silently
-pip3 install -q pandas matplotlib
-
-
 # --- Shut down ---
-#docker compose -f docker-files/docker-compose.yaml down
+#$DOCKER_COMPOSE -f docker-files/docker-compose.yaml down
