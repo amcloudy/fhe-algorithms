@@ -1,121 +1,99 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
-import numpy as np
 import os
 import warnings
-import re
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.ticker import FuncFormatter
 
-warnings.filterwarnings("ignore")
-
-# ---------- Paths ----------
-script_dir = os.path.dirname(__file__)
-csv_path = os.path.join(script_dir, "matvec_ring_bench.csv")
-output_path = os.path.join(script_dir, "matvec_plot.png")
-
-# ---------- Load Data ----------
-df = pd.read_csv(csv_path)
-df.columns = df.columns.str.strip()
-
-expected_cols = {"ring_dim", "matrix_size", "function", "time_ms"}
-if not expected_cols.issubset(df.columns):
-    raise ValueError(f"CSV must contain columns: {expected_cols}\nFound: {list(df.columns)}")
-
-df["ring_dim"] = df["ring_dim"].astype(str)
-df["matrix_size"] = df["matrix_size"].astype(int)
-
-# ---------- Style Setup ----------
-function_colors = {
+# ---------- Configuration ----------
+CSV_FILENAME = "matvec_ring_bench.csv"
+OUTPUT_PNG = "matvec_equal_linear.png"
+COLORS = {
     "helib": "#E69F00",
     "parallel": "#56B4E9",
     "custom": "#009E73",
-    "openfhe": "#D55E00",
-    "default": "#999999"
+    "openfhe": "#D55E00"
 }
-linestyles = ["solid", "dashed", "dashdot", (0, (1, 1)), (0, (3, 5, 1, 5))]
-markers = ["o", "s", "^", "D", "P", "X", "*", "v"]
-ring_dims = sorted(df["ring_dim"].unique(), key=lambda x: int(x))
-ring_styles = {
-    dim: (linestyles[i % len(linestyles)], markers[i % len(markers)])
-    for i, dim in enumerate(ring_dims)
-}
+LINESTYLES = ["solid", "dashed", "dashdot", (0, (1, 1)), (0, (3, 5, 1, 5))]
+MARKERS = ["o", "s", "^", "D", "P", "X", "*", "v"]
+REQUIRED_COLUMNS = {"ring_dim", "matrix_size", "function", "time_ms"}
 
-# ---------- Plot ----------
-fig, ax = plt.subplots(figsize=(12, 7))
-handles, labels = [], []
+# ---------- Setup ----------
+warnings.filterwarnings("ignore")
+HERE = os.path.dirname(__file__)
+CSV_PATH = os.path.join(HERE, CSV_FILENAME)
+OUTPUT_PATH = os.path.join(HERE, OUTPUT_PNG)
 
-for (ring_dim, function), group in df.groupby(["ring_dim", "function"]):
-    group_sorted = group.sort_values("matrix_size")
-    label = f"{function} @ N={ring_dim}"
-    linestyle, marker = ring_styles[ring_dim]
-    color = function_colors.get(function, function_colors["default"])
+# ---------- Load Data ----------
+def load_and_prepare_data(csv_path):
+    df = pd.read_csv(csv_path)
+    df.columns = df.columns.str.strip()
 
-    line, = ax.plot(group_sorted["matrix_size"], group_sorted["time_ms"],
-                    label=label,
-                    linestyle=linestyle,
-                    marker=marker,
-                    color=color,
-                    markersize=6,
-                    linewidth=2)
-    handles.append(line)
-    labels.append(label)
+    if not REQUIRED_COLUMNS.issubset(df.columns):
+        raise ValueError(f"CSV must contain columns {REQUIRED_COLUMNS}")
 
-# ---------- Axes ----------
-ax.set_xscale("log", base=2)
-ax.set_yscale("log")
-ax.set_xlabel("Matrix Size (log2 scale)", fontsize=13)
-ax.set_ylabel("Time (ms, log scale)", fontsize=13)
-ax.set_title("Matrix-Vector Multiplication Time by Matrix Size, Ring Dimension, and Function", fontsize=15)
+    df["ring_dim"] = df["ring_dim"].astype(str)
+    df["matrix_size"] = df["matrix_size"].astype(int)
+    df["time_s"] = df["time_ms"].astype(float) / 1000.0
+    return df
 
-# ---------- Custom Tick Labels (with default format for (x,y) coordinate working) ----------
-x_ticks = [2**i for i in range(1, 10)]
-y_ticks = [10**i for i in range(1, 6)]
+# ---------- Style Mapping ----------
+def get_style_map(unique_keys):
+    return {
+        key: (LINESTYLES[i % len(LINESTYLES)], MARKERS[i % len(MARKERS)])
+        for i, key in enumerate(unique_keys)
+    }
 
-# ax.set_xticks(x_ticks)
-# ax.set_xticklabels([f"$2^{{{int(np.log2(x))}}}$" for x in x_ticks])
-#
-# ax.set_yticks(y_ticks)
-# ax.set_yticklabels([f"$10^{int(np.log10(y))}$" for y in y_ticks])
+# ---------- Plotting ----------
+def plot_equal_linear(df, output_path):
+    fig, ax = plt.subplots(figsize=(9, 9))  # Square canvas
 
-from matplotlib.ticker import FuncFormatter
+    ring_dims = sorted(df["ring_dim"].unique(), key=int)
+    style_map = get_style_map(ring_dims)
 
-x_ticks = [2**i for i in range(1, 10)]
-y_ticks = [10**i for i in range(1, 6)]
+    for (ring_dim, func), group in df.groupby(["ring_dim", "function"]):
+        group = group.sort_values("matrix_size")
+        linestyle, marker = style_map[ring_dim]
+        ax.plot(
+            group["matrix_size"], group["time_s"],
+            label=f"{func} @ N={ring_dim}",
+            linestyle=linestyle,
+            marker=marker,
+            linewidth=2,
+            color=COLORS.get(func, "#999999"),
+            markersize=6
+        )
 
-ax.set_xticks(x_ticks)
-ax.set_yticks(y_ticks)
-
-# ✅ Pretty formatter + preserve data ticks for tooltips
-ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: f"$2^{{{int(np.log2(x))}}}$" if x in x_ticks else ""))
-ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: f"$10^{{{int(np.log10(y))}}}$" if y in y_ticks else ""))
-
-
-# ---------- Grid ----------
-ax.grid(False)
-for y in y_ticks:
-    ax.axhline(y=y, color="gray", linestyle="--", linewidth=0.5, alpha=0.6)
-for x in x_ticks:
-    ax.axvline(x=x, color="gray", linestyle=":", linewidth=0.5, alpha=0.5)
-
-# ---------- Legend ----------
-def parse_label(label):
-    match = re.search(r'(\w+)\s*@\s*N=(\d+)', label)
-    return (int(match.group(2)), match.group(1)) if match else (float('inf'), 'zzz')
-
-sorted_items = sorted(zip(labels, handles), key=lambda x: parse_label(x[0]))
-sorted_labels, sorted_handles = zip(*sorted_items)
-ax.legend(sorted_handles, sorted_labels, title="Function @ RingDim", fontsize=9, title_fontsize=10, loc="lower right")
-
-# Fix to display (x, y) manually with pretty ticks
-def format_coord(x, y):
-    return f"(x, y) = ({x:.2f}, {y:.2f})"
-
-ax.format_coord = format_coord
+    # Equal linear axis scaling
+    max_val = int(max(df["matrix_size"].max(), df["time_s"].max()) // 100 + 1) * 100
+    ticks = np.arange(0, max_val + 100, 100)
+    ax.set_xlim(0, max_val)
+    ax.set_ylim(0, max_val)
 
 
-# ---------- Save and Show ----------
-plt.tight_layout()
-plt.savefig(output_path, dpi=600, bbox_inches="tight")
-plt.show()
+    # ax.set_xticks(ticks)
+    # ax.set_yticks(ticks)
+    # ax.xaxis.set_major_formatter(FuncFormatter(lambda x, _: f"{int(x)}"))
+    # ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: f"{int(y)}"))
+    # ax.grid(which="major", linestyle="--", linewidth=0.5, alpha=0.7)
 
-print(f"✅ MatVec plot saved to: {output_path}")
+    # Labels and legend
+    ax.set_xlabel("Matrix Size", fontsize=13)
+    ax.set_ylabel("Time (s)", fontsize=13)
+    ax.set_title(
+        "Matrix–Vector Multiplication (linear, equal axes, 100‑unit grid)",
+        fontsize=15
+    )
+    ax.legend(title="Function@RingDim", loc="upper left")
+    ax.format_coord = lambda x, y: f"(x,y)=({x:.0f},{y:.0f})"
+
+    # Save and show
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.show()
+    print(f"✅ Plot saved → {output_path}")
+
+# ---------- Main ----------
+if __name__ == "__main__":
+    df = load_and_prepare_data(CSV_PATH)
+    plot_equal_linear(df, OUTPUT_PATH)
