@@ -94,7 +94,7 @@ namespace utils {
                 "Unknown";
 
             std::cout << "🔒  Security Level:    " << std::setw(18) << levelStr << "\n";
-            std::cout << "🎚️  Scaling Technique: " << std::setw(18) << static_cast<int>(cryptoParamsCKKS->GetScalingTechnique()) << "\n";
+            std::cout << "🎚️ Scaling Technique: " << std::setw(18) << static_cast<int>(cryptoParamsCKKS->GetScalingTechnique()) << "\n";
         } else {
             std::cout << "⚠️ CKKS-specific parameters unavailable.\n";
         }

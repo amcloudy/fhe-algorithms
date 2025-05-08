@@ -34,7 +34,8 @@ def load_and_prepare_data(csv_path):
 
     df["ring_dim"] = df["ring_dim"].astype(str)
     df["matrix_size"] = df["matrix_size"].astype(int)
-    df["time_s"] = df["time_ms"].astype(float) / 1000.0
+    # df["time_s"] = df["time_ms"].astype(float) / 1000.0
+    df["time_s"] = df["time_ms"].astype(float)
     return df
 
 # ---------- Style Mapping ----------
@@ -64,9 +65,9 @@ def plot_equal_linear(df, output_path):
 
     # Fixed axis limits
     ax.set_xlim(0, 1000)
-    ax.set_ylim(0, 300)
+    ax.set_ylim(0, 30000)
     ticks_x = np.arange(0, 1001, 50)
-    ticks_y = np.arange(0, 301, 10)
+    ticks_y = np.arange(0, 30001, 1000)
     ax.set_xticks(ticks_x)
     ax.set_yticks(ticks_y)
 
@@ -81,9 +82,9 @@ def plot_equal_linear(df, output_path):
 
     # Labels and legend
     ax.set_xlabel("Matrix Dimension", fontsize=13)
-    ax.set_ylabel("Time (in seconds)", fontsize=13)
+    ax.set_ylabel("Time (in milliseconds)", fontsize=13)
     ax.set_title(
-        "Matrix–Vector Multiplication: Time (in seconds) by Matrix Dimension and Ring Dimension",
+        "Matrix–Vector Multiplication: Time (in milliseconds) by Matrix Dimension and Ring Dimension",
         fontsize=15
     )
     ax.legend(title="Function @ RingDim", loc="upper right", title_fontsize=14, fontsize=14)
@@ -100,5 +101,3 @@ def plot_equal_linear(df, output_path):
 if __name__ == "__main__":
     df = load_and_prepare_data(CSV_PATH)
     plot_equal_linear(df, OUTPUT_PATH)
-
-
