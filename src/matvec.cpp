@@ -149,7 +149,7 @@ bool RunMatrixVectorMultiplication(std::string functionType, uint32_t ringDim, u
 
     // Compute encrypted matrix-vector multiplication
     Ciphertext<DCRTPoly> encResult;
-    if (functionType == "helib") {
+    if (functionType == "Halevi") {
         encResult = MatrixVectorMultiplication(cc, matrix, encVec);
     } else if (functionType == "parallel") {
         encResult = MatrixVectorMultiplicationParallel(cc, matrix, encVec);

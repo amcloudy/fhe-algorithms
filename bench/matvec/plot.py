@@ -9,7 +9,7 @@ from matplotlib.ticker import FuncFormatter
 CSV_FILENAME = "matvec_ring_bench.csv"
 OUTPUT_PNG = "matvec_plot.png"
 COLORS = {
-    "helib": "#E69F00",
+    "Halevi": "#D55E00",
     "parallel": "#56B4E9",
     "custom": "#009E73",
     "openfhe": "#D55E00"

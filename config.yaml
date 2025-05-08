@@ -19,13 +19,13 @@ matvec:
   rotation_indices: [1]
   outputCSV: "bench/matvec/matvec_ring_bench.csv"
   functionVariants:
-    - helib
+    - Halevi
 #    - parallel
 
 polyeval:
-  ringDims: [ 32768, 65536, 131072 ]
+  ringDims: [ 32768, 65536 ]
   depth: 5
-  vectorSizes: [ 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
+  vectorSizes: [ 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024]
   max_vector_value: 3.0
   outputCSV: "bench/polyeval/polyeval_ring_bench.csv"
   functionVariants:
