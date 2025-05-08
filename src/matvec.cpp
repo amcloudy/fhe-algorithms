@@ -170,7 +170,7 @@ bool RunMatrixVectorMultiplication(std::string functionType, uint32_t ringDim, u
     double ms = std::chrono::duration<double, std::milli>(end - start).count();
 
     std::cout << "🔢  Matrix dimension:  " << std::setw(18) << dim << "\n";
-    std::cout << "⏱️   Total time:     " << std::setw(18) << std::fixed << std::setprecision(2) << ms << " ms\n";
+    std::cout << "⏱️  Total time:     " << std::setw(18) << std::fixed << std::setprecision(2) << ms << " ms\n";
     std::cout << "🔍  Correctness:        " << std::setw(18) << (isEqual ? "✅" : "❌") << "\n\n";
 
     return isEqual;

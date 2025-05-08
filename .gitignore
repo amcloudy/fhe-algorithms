@@ -4,6 +4,6 @@ build/
 cmake-build-debug/
 
 *.log
-*.csv
+
 *.dot
-todo.txt
+todo.txt0
